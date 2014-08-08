@@ -1,131 +1,145 @@
-var tape = require('tape');
+module.exports = function(tape) {
 
-function clone(obj) {
-    if (obj && typeof obj === 'object') {
-        if (typeof obj.clone === 'function') {
-            return obj.clone();
-        } else {
-            throw new Error("objects must be cloneable");
-        }
-    } else if (Array.isArray(obj)) {
-        return obj.map(clone);
-    } else {
-        return obj;
-    }
-}
-
-function isEqual(left, right, inexact) {
-    if (left && typeof left === 'object') {
-        if (typeof left.eq === 'function') {
-            return left.eq(right);
-        } else {
-            throw new Error("object must have eq() method");
-        }
-    } else {
-        if (inexact) {
-            return Math.abs(left - right) < 0.000001;
-        } else {
-            return left === right;    
-        }
-    }
-}
-
-function testResult(assert, expected, actual, opts) {
-    assert.ok(isEqual(expected, actual, opts ? (!!opts.inexact) : false));
-}
-
-function testObjectMethod(receiver, method, args, expected, opts) {
-    tape("." + method + "()", function(assert) {
-        var actual = receiver[method].apply(receiver, args);
-        testResult(assert, expected, actual, opts);
-        assert.end();
-    });
-}
-
-function testSelfMutatingObjectMethod(receiver, method, args, expected, opts) {
-    
-    method += '_';
-    if (!receiver[method]) {
-        return;
+    function isObject(thing) {
+        return thing
+            && (typeof thing === 'object')
+            && (typeof thing.clone === 'function')
+            && (typeof thing.eq === 'function');
     }
 
-    tape("." + method + "()", function(assert) {
-        receiver[method].apply(receiver, args);
-        testResult(assert, expected, receiver, opts);
-        assert.end();
-    });
+    function clone(obj) {
+        if (Array.isArray(obj)) {
+            return obj.map(clone);
+        } else if (obj && typeof obj === 'object') {
+            if (isObject(obj)) {
+                return obj.clone();
+            } else {
+                throw new Error("objects must be cloneable");
+            }
+        } else {
+            return obj;
+        }
+    }
 
-}
+    function isEqual(left, right, inexact) {
+        if (left && typeof left === 'object') {
+            if (isObject(left)) {
+                return left.eq(right);
+            } else {
+                throw new Error("object must have eq() method");
+            }
+        } else {
+            if (inexact) {
+                return Math.abs(left - right) < 0.000001;
+            } else {
+                return left === right;    
+            }
+        }
+    }
 
-function testFunctionInterface(exp, receiver, method, args, expected, opts) {
-    
-    tape("exports." + method + "()", function(assert) {
+    function testResult(assert, expected, actual, opts) {
+        assert.ok(isEqual(expected, actual, opts ? (!!opts.inexact) : false));
+    }
+
+    function testObjectMethod(receiver, method, args, expected, opts) {
+        tape("." + method + "()", function(assert) {
+            var actual = receiver[method].apply(receiver, args);
+            testResult(assert, expected, actual, opts);
+            assert.end();
+        });
+    }
+
+    function testSelfMutatingObjectMethod(receiver, method, args, expected, opts) {
         
-        args.unshift(receiver);
-
-        if (Array.isArray(expected)) {
-            args.push(receiver);
-            exp[method].apply(null, args);
-            testResult(assert, expected, receiver, opts);
-        } else {
-            var res = exp[method].apply(null, args);
-            testResult(assert, expected, res, opts);
+        method += '_';
+        if (!receiver[method]) {
+            return;
         }
 
-        assert.end();
+        tape("." + method + "()", function(assert) {
+            receiver[method].apply(receiver, args);
+            testResult(assert, expected, receiver, opts);
+            assert.end();
+        });
 
-    });
+    }
 
-}
+    function testFunctionInterface(exp, receiver, method, args, expected, opts) {
 
-exports.test = test;
-function test(exp, methodName, object, args, expectedResult, opts) {
+        tape("exports." + method + "()", function(assert) {
+            
+            args.unshift(receiver);
 
-    testObjectMethod(
-        clone(object),
-        methodName,
-        clone(args),
-        expectedResult,
-        opts
-    );
+            if (isObject(expected)) {
+                args.push(receiver);
+                exp[method].apply(null, args);
+                testResult(assert, expected, receiver, opts);
+            } else {
+                var res = exp[method].apply(null, args);
+                testResult(assert, expected, res, opts);
+            }
 
-    testSelfMutatingObjectMethod(
-        clone(object),
-        methodName,
-        clone(args),
-        expectedResult,
-        opts
-    );
+            assert.end();
 
-    testFunctionInterface(
-        exp,
-        clone(object),
-        methodName,
-        clone(args),
-        expectedResult,
-        opts
-    );
+        });
 
-}
+    }
 
-exports.binaryOperator = function(exp, methodName, left, right, expectedResult, opts) {
-    test(
-        exp,
-        methodName,
-        clone(left),
-        clone(right),
-        clone(expectedResult),
-        opts
-    );
-}
+    function test(exp, methodName, object, args, expectedResult, opts) {
 
-exports.unaryOperator = function(exp, methodName, left, expectedResult, opts) {
-    test(
-        exp,
-        methodName,
-        clone(left),
-        [],
-        clone(expectedResult),
-        opts
-    );
+        testObjectMethod(
+            clone(object),
+            methodName,
+            clone(args),
+            expectedResult,
+            opts
+        );
+
+        testSelfMutatingObjectMethod(
+            clone(object),
+            methodName,
+            clone(args),
+            expectedResult,
+            opts
+        );
+
+        testFunctionInterface(
+            exp,
+            clone(object),
+            methodName,
+            clone(args),
+            expectedResult,
+            opts
+        );
+
+    }
+
+    function binaryOperator(exp, methodName, left, right, expectedResult, opts) {
+        test(
+            exp,
+            methodName,
+            clone(left),
+            [clone(right)],
+            clone(expectedResult),
+            opts
+        );
+    }
+
+    function unaryOperator(exp, methodName, left, expectedResult, opts) {
+        test(
+            exp,
+            methodName,
+            clone(left),
+            [],
+            clone(expectedResult),
+            opts
+        );
+    }
+
+    return {
+        test            : test,
+        binaryOperator  : binaryOperator,
+        unaryOperator   : unaryOperator
+    };
+
 }
