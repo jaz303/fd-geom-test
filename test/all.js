@@ -1,22 +1,22 @@
 function expect(expected, testBlock) {
 
-	var testInstance = require('..')(function(msg, testFn) {
+    var testInstance = require('..')(function(msg, testFn) {
 
-		var assert = {
-			ok: function(actual) {
-				if (expected !== actual) {
-					process.stderr.write("ERROR\n");
-					process.exit(1);
-				}
-			},
-			end: function() {}
-		};
+        var assert = {
+            ok: function(actual) {
+                if (expected !== actual) {
+                    process.stderr.write("ERROR\n");
+                    process.exit(1);
+                }
+            },
+            end: function() {}
+        };
 
-		testFn(assert);
+        testFn(assert);
 
-	});
+    });
 
-	testBlock(testInstance);
+    testBlock(testInstance);
 
 }
 
@@ -31,48 +31,48 @@ Box.prototype.add = function(other) { return new Box(this.v + other.v); }
 Box.prototype.add_ = function(other) { this.v += other.v; }
 
 var fns = {
-	double: function(v, out) {
-		out.v = v.v * 2;
-	},
-	add: function(l, r, out) {
-		out.v = l.v + r.v;
-	}
+    double: function(v, out) {
+        out.v = v.v * 2;
+    },
+    add: function(l, r, out) {
+        out.v = l.v + r.v;
+    }
 };
 
 expect(true, function(t) {
-	
-	t.unaryOperator(
-		fns,
-		'double',
-		new Box(100),
-		new Box(200)
-	);	
+    
+    t.unaryOperator(
+        fns,
+        'double',
+        new Box(100),
+        new Box(200)
+    );  
 
-	t.binaryOperator(
-		fns,
-		'add',
-		new Box(10),
-		new Box(15),
-		new Box(25)
-	);
+    t.binaryOperator(
+        fns,
+        'add',
+        new Box(10),
+        new Box(15),
+        new Box(25)
+    );
 
 });
 
 expect(false, function(t) {
-	
-	t.unaryOperator(
-		fns,
-		'double',
-		new Box(150),
-		new Box(200)
-	);	
+    
+    t.unaryOperator(
+        fns,
+        'double',
+        new Box(150),
+        new Box(200)
+    );  
 
-	t.binaryOperator(
-		fns,
-		'add',
-		new Box(10),
-		new Box(500),
-		new Box(25)
-	);
+    t.binaryOperator(
+        fns,
+        'add',
+        new Box(10),
+        new Box(500),
+        new Box(25)
+    );
 
 });
