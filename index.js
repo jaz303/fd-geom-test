@@ -7,6 +7,8 @@ function clone(obj) {
         } else {
             throw new Error("objects must be cloneable");
         }
+    } else if (Array.isArray(obj)) {
+        return obj.map(clone);
     } else {
         return obj;
     }
@@ -79,29 +81,27 @@ function testFunctionInterface(exp, receiver, method, args, expected, opts) {
 exports.test = test;
 function test(exp, methodName, object, args, expectedResult, opts) {
 
-    function mkargs() { return args.map(clone); }
-
     testObjectMethod(
-        object.clone(),
+        clone(object),
         methodName,
-        mkargs(),
+        clone(args),
         expectedResult,
         opts
     );
 
     testSelfMutatingObjectMethod(
-        object.clone(),
+        clone(object),
         methodName,
-        mkargs(),
+        clone(args),
         expectedResult,
         opts
     );
 
     testFunctionInterface(
         exp,
-        object.clone(),
+        clone(object),
         methodName,
-        mkargs(),
+        clone(args),
         expectedResult,
         opts
     );
@@ -113,7 +113,7 @@ exports.binaryOperator = function(exp, methodName, left, right, expectedResult, 
         exp,
         methodName,
         clone(left),
-        [right].map(clone),
+        clone(right),
         clone(expectedResult),
         opts
     );
