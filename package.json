@@ -1,0 +1,23 @@
+{
+  "name": "fd-geom-test",
+  "version": "0.0.0",
+  "description": "Test helper library for testing my geometry libraries",
+  "main": "index.js",
+  "dependencies": {
+    "tape": "^2.13.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaz303/fd-geom-test.git"
+  },
+  "author": "Jason Frame <jason@onehackoranother.com> (http://jasonframe.co.uk)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaz303/fd-geom-test/issues"
+  },
+  "homepage": "https://github.com/jaz303/fd-geom-test"
+}
