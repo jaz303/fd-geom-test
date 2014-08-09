@@ -4,7 +4,7 @@ This library probably isn't much use to anyone but myself but read on if you're 
 
 `fd-geom-test` is a helper library I've been using to test my recent spate of geometry libraries such as `fd-vec2`, `fd-size`, `fd-rect`, and so-on.
 
-Geometry code often involves manipulating lots of temporary intermediate data, and since these are usually composite values such as points and rectangles it's necessary to represent them using objects. Rapdi allocating all of such temporary values, however, can be inefficient, so sometimes it makes sense ease GC pressure by reusing previously-allocated objects rather than creating new ones. On the flip-side, unfortunately, this style of programming often results in a more verbose and somewhat opaque API. Compare:
+Geometry code often involves manipulating lots of temporary intermediate data, and since these are usually composite values such as points and rectangles it's necessary to represent them using objects. Rapidly allocating these temporary values, however, can be inefficient, so sometimes it makes sense ease GC pressure by reusing previously-allocated objects rather than creating new ones. On the flip-side, unfortunately, this style of programming often results in a more verbose and somewhat opaque API. Compare:
 
 ```javascript
 var v1 = vec2(1, 6);
@@ -30,7 +30,7 @@ vec2.add(v1, v3, v1);
 return v1;
 ```
 
-The second example creates two fewer temporary objects but the prices is that its API is less intuitive. Most of the time, however, we're not worried about efficiency so the code in the more readable first example should be fine.
+The second example creates fewer temporary objects but the price is that its API is less intuitive. Most of the time, however, we're not worried about efficiency so the code in the more readable first example should be fine.
 
 All of my geometry libraries expose their operations through three "flavours" of API, allowing readable code to be used the majority of the time, with the option to drop down to more memory-efficient methods as necessary. The three API flavours are:
 
