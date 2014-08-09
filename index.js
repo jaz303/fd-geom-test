@@ -1,4 +1,4 @@
-module.exports = function(tape) {
+module.exports = function(tape, topLevel) {
 
     function isObject(thing) {
         return thing
@@ -64,7 +64,7 @@ module.exports = function(tape) {
 
     }
 
-    function testFunctionInterface(exp, receiver, method, args, expected, opts) {
+    function testFunctionInterface(receiver, method, args, expected, opts) {
 
         tape("exports." + method + "()", function(assert) {
             
@@ -72,10 +72,10 @@ module.exports = function(tape) {
 
             if (isObject(expected)) {
                 args.push(receiver);
-                exp[method].apply(null, args);
+                topLevel[method].apply(null, args);
                 testResult(assert, expected, receiver, opts);
             } else {
-                var res = exp[method].apply(null, args);
+                var res = topLevel[method].apply(null, args);
                 testResult(assert, expected, res, opts);
             }
 
@@ -85,7 +85,7 @@ module.exports = function(tape) {
 
     }
 
-    function test(exp, methodName, object, args, expectedResult, opts) {
+    function test(methodName, object, args, expectedResult, opts) {
 
         testObjectMethod(
             clone(object),
@@ -104,7 +104,6 @@ module.exports = function(tape) {
         );
 
         testFunctionInterface(
-            exp,
             clone(object),
             methodName,
             clone(args),
@@ -114,9 +113,8 @@ module.exports = function(tape) {
 
     }
 
-    function binaryOperator(exp, methodName, left, right, expectedResult, opts) {
+    function binaryOperator(methodName, left, right, expectedResult, opts) {
         test(
-            exp,
             methodName,
             clone(left),
             [clone(right)],
@@ -125,9 +123,8 @@ module.exports = function(tape) {
         );
     }
 
-    function unaryOperator(exp, methodName, left, expectedResult, opts) {
+    function unaryOperator(methodName, left, expectedResult, opts) {
         test(
-            exp,
             methodName,
             clone(left),
             [],

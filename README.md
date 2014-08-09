@@ -50,8 +50,7 @@ var tape = require('tape');
 
 var vec2 = require('fd-vec2');
 
-require('fd-geom-test')(tape).binaryOperator(
-	vec2,
+require('fd-geom-test')(tape, vec2).binaryOperator(
 	'add',
 	new vec2.Vec2(10, 15),
 	new vec2.Vec2(30, 50),

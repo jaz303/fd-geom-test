@@ -14,7 +14,7 @@ function expect(expected, testBlock) {
 
         testFn(assert);
 
-    });
+    }, fns);
 
     testBlock(testInstance);
 
@@ -42,14 +42,12 @@ var fns = {
 expect(true, function(t) {
     
     t.unaryOperator(
-        fns,
         'double',
         new Box(100),
         new Box(200)
     );  
 
     t.binaryOperator(
-        fns,
         'add',
         new Box(10),
         new Box(15),
@@ -61,14 +59,12 @@ expect(true, function(t) {
 expect(false, function(t) {
     
     t.unaryOperator(
-        fns,
         'double',
         new Box(150),
         new Box(200)
     );  
 
     t.binaryOperator(
-        fns,
         'add',
         new Box(10),
         new Box(500),
