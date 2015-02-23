@@ -1,6 +1,6 @@
 {
   "name": "fd-geom-test",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Test helper library for testing my geometry libraries",
   "main": "index.js",
   "scripts": {
