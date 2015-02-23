@@ -21,15 +21,29 @@ module.exports = function(tape, topLevel) {
         }
     }
 
-    function isEqual(left, right, inexact) {
+    function isEqual(left, right, opts) {
         if (left && typeof left === 'object') {
-            if (isObject(left)) {
+            if (opts.compareProperties) {
+                for (var k in left) {
+                    var l = left[k], r = right[k];
+                    if (opts.inexact) {
+                        if (Math.abs(l - r) >= 0.000001) {
+                            return false;
+                        }
+                    } else {
+                        if (l !== r) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            } else if (typeof left.eq === 'function') {
                 return left.eq(right);
             } else {
                 throw new Error("object must have eq() method");
             }
         } else {
-            if (inexact) {
+            if (opts.inexact) {
                 return Math.abs(left - right) < 0.000001;
             } else {
                 return left === right;    
@@ -38,7 +52,7 @@ module.exports = function(tape, topLevel) {
     }
 
     function testResult(assert, expected, actual, opts) {
-        assert.ok(isEqual(expected, actual, opts ? (!!opts.inexact) : false));
+        assert.ok(isEqual(expected, actual, opts || {}));
     }
 
     function testObjectMethod(receiver, method, args, expected, opts) {
